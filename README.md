@@ -31,7 +31,7 @@ $ lyp install server
 Run the following lilypond script:
 
 ```lilypond
-\require "server"
+\require "lys"
 
 % listen on port 1225 ("ly" in numbers)
 #(lys:start)
@@ -43,7 +43,7 @@ Run the following lilypond script:
 Or alternatively, run from the command line:
 
 ```bash
-$ lilypond -r server -e "#(lys:start)"
+$ lilypond -r lys -e "#(lys:start)"
 ```
 
 ## Connecting
