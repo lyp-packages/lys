@@ -8,7 +8,7 @@ Because sometimes lilypond is just too damn slow...
 
 ## Mode of operation
 
-The server.ly script starts a server on port 12321. Clients connect and can pass arbitrary scheme expressions. For example, to typeset a lilypond file, a client can invoke `(lys:compile pwd opts...)` where pwd is the current working directory and opts is a list of command line options:
+The listens on port 1225 (by default). Clients connect and pass arbitrary scheme expressions. For example, to typeset a lilypond file, a client can send `(lys:compile pwd opts...)` where pwd is the current working directory and opts is a list of command line options:
 
 ```scheme
 (lys:compile "/home/sharon" "--png" "myfile")
@@ -18,11 +18,6 @@ The server.ly script starts a server on port 12321. Clients connect and can pass
 
 Small files compile in 0.2-0.3s (on a modern laptop). Generally one can expect to shave 0.5-0.6s off compilation time.
 
-## Problems & Limitations
-
-- `lys:compile` can't handle --loglevel and --include options.
-- This is a proof of concept. It's not very well tested and might not work on anything bigger than 20 bars.
-
 ## Installation
 
 Install using [lyp](https://github.com/noteflakes/lyp):
@@ -31,7 +26,7 @@ Install using [lyp](https://github.com/noteflakes/lyp):
 $ lyp install server
 ```
 
-## Starting a server
+## Starting a Server
 
 Run the following lilypond script:
 
@@ -59,5 +54,19 @@ Commands can be sent to the server by piping to `nc`:
 echo "(lys:compile \"~\" \"myfile.ly\")" | nc localhost 1225
 ```
 
+## The lys:compile command
+
+The server implementation includes the `lys:compile` command that provides a functionality identical to the lilypond command line interface.
+
+Usage: `lys:compile pwd opt ...`
+
+where `pwd` is the client's working directory, and opt is one or more command line options. `lys:compile` currently handles all of lilypond's command line options except `--loglevel` and `--include`.
+
+
+
 See also the included [example client](https://github.com/noteflakes/lyp-server/blob/master/test/lyc.sh).
 
+## Problems & Limitations
+
+- `lys:compile` can't handle --loglevel and --include options.
+- This is a proof of concept. It's not very well tested and might not work on anything bigger than 20 bars.
