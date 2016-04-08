@@ -34,16 +34,16 @@ Run the following lilypond script:
 \require "lys"
 
 % listen on port 1225 ("ly" in numbers)
-#(lys:start)
+#(lys:start-server)
 
 % to specifiy the listening port:
-#(lys:start 12321)
+#(lys:start-server 12321)
 ```
 
 Or alternatively, run from the command line:
 
 ```bash
-$ lilypond -r lys -e "#(lys:start)"
+$ lilypond -r lys -e "#(lys:start-server)"
 ```
 
 ## Connecting
@@ -51,22 +51,46 @@ $ lilypond -r lys -e "#(lys:start)"
 Commands can be sent to the server by piping to `nc`:
 
 ```bash
-echo "(lys:compile \"~\" \"myfile.ly\")" | nc localhost 1225
+echo "(lys:compile-file \"~\" \"myfile.ly\")" | nc localhost 1225
 ```
 
-## The lys:compile command
-
-The server implementation includes the `lys:compile` command that provides a functionality identical to the lilypond command line interface.
-
-Usage: `lys:compile pwd opt ...`
-
-where `pwd` is the client's working directory, and opt is one or more command line options. `lys:compile` currently handles all of lilypond's command line options except `--loglevel` and `--include`.
-
-
+## API
 
 See also the included [example client](https://github.com/noteflakes/lyp-server/blob/master/test/lyc.sh).
 
-## Problems & Limitations
+### lys:close
 
-- `lys:compile` can't handle --loglevel and --include options.
-- This is a proof of concept. It's not very well tested and might not work on anything bigger than 20 bars.
+Usage: `lyp:close`
+
+Normally, a connection to the server stays open until the client disconnects. A client connecting through `nc` can ask the server to shutdown the connection by sending `(lyp:close)`.
+
+### lys:compile-file
+
+Usage: `lys:compile-file pwd opt ...`
+
+Compile a lilypond file, where `pwd` is the client's working directory, and opt is one or more [lilypond command line options](http://lilypond.org/doc/v2.18/Documentation/usage/command_002dline-usage.en.html). `lys:compile-file` currently handles all of lilypond's command line options except `--loglevel` and `--include`.
+
+Example: `(lys:compile-file "/Users/dudu" "--png" "myfile.ly")`
+
+### lys:stdin-eval-loop
+
+Usage: `lys:stdin-eval-loop`
+
+Start an evaluate loop on stdin. This can be used to start a long-running slave lilypond process that evaluates arbitrary scheme expressions received on stdin.
+
+### lys:spawn
+
+Usage: `lys:spawn expr ...`
+
+Fork and evaluate a sequence of expressions in the child process. Returns the child pid.
+
+Example: `(lys:spawn (lys:compile-file "/Users/dudu" "--png" "myfile.ly"))`
+
+### lys:typeset-music-slice
+
+Usage: `lys:typeset-music-slice music start-moment end-moment filename`
+
+Compile a range of the given music variable between two moments and output to the given filename. The moments are specified as lists that are converted into ly:moment.
+
+Example: `(lys:typeset-music-slice myMusic '(3 1) '(6 1) "music3-6")`
+

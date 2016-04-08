@@ -7,24 +7,22 @@
   (use-modules (ice-9 popen) (ice-9 rdelim))
 
   (define (setup)
-    (let* ((child-pid (primitive-fork)))
-          (if (zero? child-pid)
-              (lys:start)
-              
-              (begin
-                (display (format "spawned server process ~a\n" child-pid))
-                (display "running tests...\n")
-                (catch #t (lambda () (run-tests))
-                  (lambda (key . params)
-                    (display (format "Error: ~a\n" (cadr params)))))
-                (display (format "kill server process ~a\n" child-pid))
-                (catch #t (lambda () (kill child-pid SIGINT))
-                          (lambda (key . params) (display (format "Error ~a:~a\n" key params))))
-                (waitpid child-pid 0)))))
+    (let* ((child-pid (lys:spawn (lys:start-server))))
+      (begin
+        (display (format "spawned server process ~a\n" child-pid))
+        (display "running tests...\n")
+        (catch #t (lambda () (run-tests))
+          (lambda (key . params)
+            (display (format "Error: ~a\n" (cadr params)))))
+        (display (format "kill server process ~a\n" child-pid))
+        (catch #t (lambda () (kill child-pid SIGINT))
+                  (lambda (key . params) (display (format "Error ~a:~a\n" key params))))
+        (waitpid child-pid 0))))
                 
   
   (define (run-tests) (begin
-    (test-connect)))
+    (test-connect)
+  ))
 
   (define (test-connect)
     (let* ((output (send-to-server "(lys:close)")))
