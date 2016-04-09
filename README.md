@@ -86,11 +86,19 @@ Fork and evaluate a sequence of expressions in the child process. Returns the ch
 
 Example: `(lys:spawn (lys:compile-file "/Users/dudu" "--png" "myfile.ly"))`
 
-### lys:typeset-music-slice
+### lys:typeset
 
-Usage: `lys:typeset-music-slice music start-moment end-moment filename`
+Usage: `lys:typeset-slice music filename`
+
+Compile the given music variable into to the given output filename.
+
+Example: `(lys:typeset myMusic "my-music")`
+
+### lys:typeset-slice
+
+Usage: `lys:typeset-slice music start-moment end-moment filename`
 
 Compile a range of the given music variable between two moments and output to the given filename. The moments are specified as lists that are converted into ly:moment.
 
-Example: `(lys:typeset-music-slice myMusic '(3 1) '(6 1) "music3-6")`
+Example: `(lys:typeset-slice myMusic '(3 1) '(6 1) "music3-6")`
 

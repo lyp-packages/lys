@@ -99,6 +99,29 @@
 (define lys:compile-options-spec
   (append lys:standard-compile-options-spec lys:advanced-compile-options-spec))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (lys:typeset music output-filename)
+  (let* ((t1 (get-internal-real-time))
+         (score (scorify-music music)))
+    (set! (paper-variable #f 'output-filename) output-filename)
+    (lys:bookify-score score)
+    (lys:display-elapsed t1)
+  ; restore music length
+))
+
+(define (lys:typeset-slice music m1 m2 output-filename)
+  (let* ((t1 (get-internal-real-time))
+         (m1 (apply ly:make-moment m1))
+         (m2 (apply ly:make-moment m2))
+         (music-length (ly:music-length music))
+         (score (scorify-music (lys:slice-music music m1 m2))))
+    (set! (paper-variable #f 'output-filename) output-filename)
+    (lys:bookify-score score)
+    (lys:display-elapsed t1)
+    ; important: restore music length, otherwise it will stay chopped
+    (set! (ly:music-property music 'length) music-length)))
+
 (define (lys:slice-music music m1 m2) (let* (
     (music-length (ly:music-length music))
     (m2 (if (moment<=? music-length m2) music-length m2))
@@ -120,21 +143,7 @@
     (make-simultaneous-music (list
       (make-sequential-music skip-music)
       music)))))
-      
-(define (lys:typeset-music-slice music m1 m2 output-filename)
-  (let* ((t1 (get-internal-real-time))
-         (m1 (apply ly:make-moment m1))
-         (m2 (apply ly:make-moment m2))
-         (music-length (ly:music-length music))
-         (score (scorify-music (lys:slice-music music m1 m2)))
-         (layout (ly:output-def-clone $defaultlayout)))
-    (ly:score-add-output-def! score layout)
-    (set! (paper-variable #f 'output-filename) output-filename)
-    (lys:bookify-score score)
-    (lys:display-elapsed t1)
-    ; restore music length
-    (set! (ly:music-property music 'length) music-length)))
-
+  
 (define (lys:bookify-score score)
   (let* ((book-handler (if (defined? 'default-toplevel-book-handler)
                            default-toplevel-book-handler
