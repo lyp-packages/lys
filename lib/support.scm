@@ -45,11 +45,3 @@
 (define (lys:display-elapsed t1)
   (display (format "Elapsed: ~as\n" (lys:elapsed t1 (get-internal-real-time)))))
 
-; fork and evaluate the given body in the child process. returns the child pid.
-(define-macro (lys:spawn . body)
-`(let ((l (lambda () (begin . ,body)))
-       (c (primitive-fork))) 
-      (if (zero? c)
-          (begin (l) (primitive-exit))
-          c)))
-

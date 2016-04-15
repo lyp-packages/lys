@@ -23,7 +23,7 @@ Small files compile in 0.2-0.3s (on a modern laptop). Generally one can expect t
 Install using [lyp](https://github.com/noteflakes/lyp):
 
 ```bash
-$ lyp install server
+$ lyp install lys
 ```
 
 ## Starting a Server
