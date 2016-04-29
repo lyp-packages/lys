@@ -4,7 +4,7 @@
 # server. The first item in the list is the client's working directory, followed
 # by the client's name (so getopt-long will be happy), and then the actual
 # arguments.
-opts="(lys:compile \"$(pwd)\""
+opts="(lys:compile-file \"$(pwd)\""
 for v in "$@"
 do
   # escape double quotes

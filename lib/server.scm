@@ -24,8 +24,8 @@
   (display (format "start client handler (pid ~a)\n" (getpid)))
   (set! lys:socket socket)
   ; redirect stdout, stderr to client
-  ;(redirect-port socket (current-output-port))
-  ;(redirect-port socket (current-error-port))
+  (redirect-port socket (current-output-port))
+  (redirect-port socket (current-error-port))
   (display (format "GNU LilyPond Server ~a\n" (lilypond-version)) socket)
   (lys:eval-loop socket)
   (display "client done!\n")
