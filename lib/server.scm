@@ -1,9 +1,20 @@
 (define lys:default-port 1225) ; "ly" in numbers
 
+(define lys:output-port (dup (current-output-port)))
+(define (lys:debug msg)
+  (begin
+    (display (format "~a (~a): " (strftime "%Y-%m-%d %H:%M:%S" (localtime (current-time))) (getpid)) lys:output-port)
+    (display msg lys:output-port)
+    (newline lys:output-port)
+    (force-output lys:output-port))) 
+
 (define (lys:start-server . args)
   (let* ((port (if (null? args) lys:default-port (car args)))
          (server-socket (lys:open-socket-for-listening port)))
-    (display (format "\nListening on port ~a (pid ~a)\n" port (getpid)))
+    (newline lys:output-port)
+    (lys:debug (format "Listening on port ~a" port))
+    (flush-all-ports)
+
     (while #t
       (let ((connection (accept server-socket)))
         (lys:fork-worker (lambda () (lys:client-handler (car connection))))))))
@@ -18,18 +29,18 @@
 (define lys:socket #f)
 (define lys:persist #f)
 
-(define (lys:client-handler socket) (let* (
-    (old-output (current-output-port))
-  )
-  (display (format "start client handler (pid ~a)\n" (getpid)))
+(define (lys:client-handler socket) (begin
+  (lys:debug "start client handler")
+
   (set! lys:socket socket)
+  (set! lys:output-port (dup (current-output-port)))
+
   ; redirect stdout, stderr to client
   (redirect-port socket (current-output-port))
   (redirect-port socket (current-error-port))
-  (display (format "GNU LilyPond Server ~a\n" (lilypond-version)) socket)
+  (display (format "GNU LilyPond Server ~a\n>" (lilypond-version)) socket)
   (lys:eval-loop socket)
-  (display "client done!\n")
+  (lys:debug "client done!")
   (primitive-exit)))
     
 (define (lys:close) (shutdown lys:socket 1))
-

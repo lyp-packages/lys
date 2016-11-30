@@ -9,11 +9,11 @@
          (files (car opts))
          (compile-opts (cdr opts)))
     ; change to working directory of client
+
     (chdir dir)
     (lys:set-compile-options compile-opts)
     (for-each lys:parse-file files)
-    (lys:display-elapsed t1)
-  (if (not lys:persist) (shutdown lys:socket 1))))
+    (lys:display-elapsed t1)))
 
 ; add "lyc" to head of opts list, and translate advanced opts e.g. -dbackend
 ; into --dbackend, so getopt-long will be able to deal with them...

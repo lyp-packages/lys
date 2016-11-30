@@ -26,7 +26,7 @@
 
   (define (test-connect)
     (let* ((output (send-to-server "(lys:close)")))
-          (assert:string=? output "GNU LilyPond Server 2.19.37")
+          (assert:string=? output "GNU LilyPond Server 2.19.37>")
   ))
   
   (define (send-to-server cmd)

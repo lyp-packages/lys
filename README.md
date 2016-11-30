@@ -1,22 +1,10 @@
 # lys - Run lilypond as a server
 
-This package provides a command for running lilypond as a server.
+This package provides a way to keep Lilypond running in the background as a server. It then extends the `lyp compile` command to compile user files by sending requests to the running Lilypond instance. The server can also be connected to using `telnet` or from any programming language by opening a TCP port.  
 
 ## Why?
 
-Because sometimes lilypond is just too damn slow...
-
-## Mode of operation
-
-The listens on port 1225 (by default). Clients connect and pass arbitrary scheme expressions. For example, to typeset a lilypond file, a client can send `(lys:compile pwd opts...)` where pwd is the current working directory and opts is a list of command line options:
-
-```scheme
-(lys:compile "/home/sharon" "--png" "myfile")
-```
-
-## How fast is it?
-
-Small files compile in 0.2-0.3s (on a modern laptop). Generally one can expect to shave 0.5-0.6s off compilation time.
+Because Lilypond is just too damn slow...
 
 ## Installation
 
@@ -26,9 +14,37 @@ Install using [lyp](https://github.com/noteflakes/lyp):
 $ lyp install lys
 ```
 
-## Starting a Server
+# Compiling using the server
 
-Run the following lilypond script:
+To compile files using the server command, use the `lyp compile` command and add the `-s` or `--server` option:
+
+```bash
+$ lyp compile -s myfile.ly
+```
+
+You can of course add any other Lilypond option you wish for, e.g.:
+
+```bash
+$ lyp compile -s --png myfile.ly
+```
+
+The server is started automatically. You can kill it at any time by the usual means.
+
+## Mode of operation
+
+The server listens on port 1225 (by default). Clients can connect and pass arbitrary scheme expressions. For example, to typeset a lilypond file, a client can send `(lys:compile dir opts...)` where pwd is the current working directory and opts is a list of command line options:
+
+```scheme
+(lys:compile "/home/sharon" "--png" "myfile")
+```
+
+## How fast is it?
+
+Small files compile in 0.3-0.4s (on a modern laptop). Generally one can expect to shave 0.5-0.6s off compilation time.
+
+## Manually starting a Server
+
+To start a server, run the following lilypond script:
 
 ```lilypond
 \require "lys"
@@ -40,23 +56,23 @@ Run the following lilypond script:
 #(lys:start-server 12321)
 ```
 
-Or alternatively, run from the command line:
+Or alternatively, run from the shell:
 
 ```bash
 $ lilypond -r lys -e "#(lys:start-server)"
 ```
 
-## Connecting
+## Connecting from the shell
 
 Commands can be sent to the server by piping to `nc`:
 
 ```bash
-echo "(lys:compile-file \"~\" \"myfile.ly\")" | nc localhost 1225
+$ echo "(lys:compile-file \"~\" \"myfile.ly\")" | nc localhost 1225
 ```
 
 ## API
 
-See also the included [example client](https://github.com/noteflakes/lyp-server/blob/master/test/lyc.sh).
+See also the included [example client](test/lyc.sh).
 
 ### lys:close
 
